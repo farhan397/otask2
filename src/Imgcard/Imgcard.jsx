@@ -1,72 +1,61 @@
-import React, { useState,useEffect } from 'react'
-import { APIdata } from '../Data/Data';
-import Card from '../Card/Card';
-import {BsSave} from "react-icons/bs";
+import React, { useState, useEffect } from "react";
+// import { APIdata } from "../Data/Data";
+import Card from "../Card/Card";
+import { BsSave } from "react-icons/bs";
+import { RiNotification2Line } from "react-icons/ri";
+
 import { useRef } from "react";
-// import clsx from "clsx";
-// import useLazyLoad from '../useLazyLoad';
-// import { LoadingPosts } from '../LoadingPosts';
+import axios from "axios";
+
 
 const NUM_PER_PAGE = 6;
 const TOTAL_PAGES = 3;
 
 
-const baseURL = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&page=2&api_key=ywwK2E7QIUaWuUpKNFrSg8j14WLj7THEKKPIURWg";
 
-const Imgcard = () => {
+const Imgcard = (props) => {
   const [datess, setdate] = useState("");
   const [rovers, setrovers] = useState("");
   const [camera, setcamera] = useState("");
-  const [filterarray, setfilterarray] = useState(APIdata);
+  const [filterarray, setfilterarray] = useState([]);
+  const [data, setData] = useState([]);
   const [first, setFirst] = useState(10);
-  const [dropdownpage, setdropdownpage] = useState(APIdata.length);
+  const [dropdownpage, setdropdownpage] = useState(data.length);
   const [rows, setRows] = useState(0);
 
-  //  const images = filterarray(APIdata);
-    const triggerRef = useRef(null);
-  //   const onGrabData = (currentPage) => {
-  //       // This would be where you'll call your API
-  //       return new Promise((resolve) => {
-  //       setTimeout(() => {
-  //           const data = APIdata.slice(
-  //           ((6 - 1)%TOTAL_PAGES) * NUM_PER_PAGE,
-  //           NUM_PER_PAGE * (6%TOTAL_PAGES)
-  //           );
-  //           console.log(data);
-  //           resolve(data);
-  //       }, 3000);
-  //       });
-  //   };
-  // const { data, loading } = useLazyLoad({ triggerRef, onGrabData });
-  
+  console.log("getsavevalue", props.data)
 
- 
- 
+  useEffect(() => {
+   
+    axios
+      .get(
+        "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&page=2&api_key=IjogzEZwfkiZ90b8ymZs9LUgtNqZ3YHf0QahCdlS"
+      )
+      .then(response =>{setData(response.data.photos);
+        setfilterarray(response.data.photos)
+          })
+         .catch(error => console.log(error));
+  }, []);
+  const triggerRef = useRef(null);
 
-
-  
-
-  
-// debugger
-console.log(first);
- 
+  console.log(first);
 
   const btnsearch = () => {
-    console.log(datess);
-    console.log(rovers);
-    console.log(camera);
-
-    const filteredUser = APIdata.filter((item) => {
-      return item.camera.full_name === camera && item.earth_date === datess && item.rover.name
-    })
+    // console.log(datess);
+    // console.log(rovers);
+    // console.log(camera);
+    const filteredUser = data.filter((item) => {
+      return (
+        item.camera.full_name === camera &&
+        // item.earth_date === datess &&
+        item.rover.name
+      );
+    });
     setfilterarray(filteredUser);
     //  settotal(filterarray.length);
-
-  }
+  };
   const handelInfiniteScroll = async () => {
-    // console.log("scrollHeight" + document.documentElement.scrollHeight);
-    // console.log("innerHeight" + window.innerHeight);
-    // console.log("scrollTop" + document.documentElement.scrollTop);
+    
     try {
       if (
         window.innerHeight + document.documentElement.scrollTop + 1 >=
@@ -75,7 +64,6 @@ console.log(first);
         // setLoading(true);
         setFirst((first) => first + 5);
         // setFirst(pre);
- 
       }
     } catch (error) {
       console.log(error);
@@ -85,19 +73,16 @@ console.log(first);
     window.addEventListener("scroll", handelInfiniteScroll);
     return () => window.removeEventListener("scroll", handelInfiniteScroll);
   }, []);
- 
-  
- 
-
 
   return (
-
     <>
-      <div class="dropdownitems" style={{
-       backgroundColor: "rgb(215, 230, 221)",
-        margin: '10px'
-      }}>
-
+      <div
+        class="dropdownitems"
+        style={{
+          backgroundColor: "rgb(215, 230, 221)",
+          margin: "10px",
+        }}
+      >
         <div class="select1">
           <label
             for="first"
@@ -114,20 +99,20 @@ console.log(first);
             Rover
           </label>
 
-          <select name="format" id="format" onChange={(e) => {
-            setrovers(e.target.value);
-          }}>
+          <select
+            name="format"
+            id="format"
+            onChange={(e) => {
+              setrovers(e.target.value);
+            }}
+          >
             <option selected>Enter value...</option>
             <option>Curiosity</option>
-
           </select>
         </div>
-        <label
-          style={{ fontSize: 15, color: "red", paddingLeft: 20 }}
-        ></label>
+        <label style={{ fontSize: 15, color: "red", paddingLeft: 20 }}></label>
 
         {/* select2 item */}
-
 
         <div class="select1">
           <label
@@ -145,45 +130,82 @@ console.log(first);
             Camera
           </label>
 
-          <select name="format" id="format" onChange={(e) => {
-            setcamera(e.target.value);
-          }}>
+          <select
+            name="format"
+            id="format"
+            onChange={(e) => {
+              setcamera(e.target.value);
+            }}
+          >
             <option selected>Enter value...</option>
             <option>Mast Camera</option>
-
           </select>
         </div>
-        <label
-          style={{ fontSize: 15, color: "red", paddingLeft: 20 }}
-        ></label>
+        <label style={{ fontSize: 15, color: "red", paddingLeft: 20 }}></label>
 
         <div className="sdate">
-          <input type="date" style={{
-            width: '200px',
-            height: '30px'
-
-          }} onChange={(e) => {
-            setdate(e.target.value);
-
-          }} />
-
+          <input
+            type="date"
+            style={{
+              width: "200px",
+              height: "30px",
+            }}
+            onChange={(e) => {
+              setdate(e.target.value);
+            }}
+          />
         </div>
 
-        <button type="button" onClick={btnsearch} style={{
-          width: '100px',
-          height: '35px',
-          backgroundColor: "rgb(73, 214, 160)"
+        <button
+          type="button"
+          onClick={btnsearch}
+          style={{
+            width: "100px",
+            height: "35px",
+            backgroundColor: "rgb(73, 214, 160)",
+          }}
+        >
+          Search
+        </button>
 
-        }}>Search</button>
+        <div className="sdate">
 
-       <div className="sdate">
-             <BsSave/>
-
+        <span
+                for="first"
+                style={{
+                  position: "absolute",
+                  fontSize: 10,
+                 
+                 
+                  top: "4ex",
+                  padding:'3px',
+                  borderRadius:"40%",
+                  backgroundColor:"red",
+                 color:"white",
+                  zIndex: 1,
+                  
+                }}
+              >
+               { props.data.length}
+              </span>
+        
+          {/* <BsSave /> */}
+          <RiNotification2Line/>
         </div>
       </div>
 
-      <div className="parentContainer" style={{ display: 'flex', flexWrap: 'wrap', padding: '1px', justifyContent: 'center', alignItems: 'center' }}
-      >{rows===0&&( 
+      <div
+        className="parentContainer"
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          padding: "1px",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        
+        {rows===0&&( 
           filterarray.slice(1,first).map((card, index) => (
             <Card item={card} key={index}
 
@@ -230,8 +252,8 @@ console.log(first);
             setdropdownpage(e.target.value);
             setRows(1)
           }}>
-            <option selected value={6}>5</option>
-            
+            <option selected value={filterarray.length}></option>
+            <option value={6}>5</option>
             <option value={11}>10</option>
             <option value={16}>15</option>
             <option value={21}>20</option>
